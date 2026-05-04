@@ -130,7 +130,7 @@ QResist.shared.validate(digest: fromServer, expectedDigest: onDevice, provider: 
 swift test
 ```
 
-All 49 tests pass across five test suites:
+All 49 tests pass across seven test suites:
 
 | Suite | Tests |
 |---|---|
