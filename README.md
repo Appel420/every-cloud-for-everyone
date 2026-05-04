@@ -10,7 +10,7 @@ A Swift package that applies client-side encryption on top of every major cloud 
 
 Every cloud account is *sealed* before any data leaves your device:
 
-1. A passphrase is used to derive a 256-bit key with **Scrypt** (a memory-hard KDF in the same class as Argon2id, provided by CryptoSwift).
+1. A passphrase is used to derive a 256-bit key with **Scrypt** (a memory-hard KDF similar in purpose to Argon2id, provided by CryptoSwift).
 2. The plaintext is encrypted with AES-GCM — the cloud provider only ever receives ciphertext.
 3. A SHA-256 integrity digest (Blake3-compatible interface) is computed and stored locally.
 4. QResist monitors uplinks; if a digest mismatch is detected the uplink is killed.
@@ -148,7 +148,7 @@ All 49 tests pass across seven test suites:
 
 | Component | Current implementation | Production target |
 |---|---|---|
-| Key derivation | Scrypt (CryptoSwift) – memory-hard KDF, same class as Argon2id | Argon2id via C interop |
+| Key derivation | Scrypt (CryptoSwift) – memory-hard KDF similar in purpose to Argon2id | Argon2id via C interop |
 | Integrity hash | SHA-256 (swift-crypto, Blake3-compatible API) | Blake3 via dedicated Swift package |
 | Symmetric encryption | AES-256-GCM | AES-256-GCM (unchanged) |
 | Messaging layer | Conceptual (Signal Protocol design) | libsignal-client |

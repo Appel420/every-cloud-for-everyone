@@ -58,9 +58,10 @@ public final class KeyManager: Sendable {
     // MARK: - Private helpers
 
     private static func derive(passphrase: String, salt: Data) -> SymmetricKey {
+        // 16 384 KiB → N = 16 384, r = 8 → ~16 MiB memory (OWASP Argon2id minimum).
         let params = Argon2Wrapper.Parameters(
-            memoryCostKiB: 19_456,
-            iterations: 2,
+            memoryCostKiB: 16_384,
+            iterations: 1,
             parallelism: 1,
             outputLength: keyByteLength
         )
