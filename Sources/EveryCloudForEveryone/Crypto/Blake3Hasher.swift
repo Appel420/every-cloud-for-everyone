@@ -6,7 +6,8 @@ import Crypto
 /// **Current algorithm: SHA-256** (from `swift-crypto`).
 /// The struct exposes the same interface that a native Blake3 implementation
 /// would use, so callers need no changes when a dedicated Blake3 Swift package
-/// is wired in. CryptoSwift 1.10 (the version used here) does not ship Blake3.
+/// is wired in. CryptoSwift (>= 1.8.3, the version range used here) does not
+/// ship a Blake3 implementation.
 public struct Blake3Hasher: Sendable {
 
     // MARK: - Hash
