@@ -3,9 +3,10 @@ import Crypto
 
 /// Computes Blake3-compatible integrity hashes over arbitrary data.
 ///
-/// The current implementation uses SHA-256 as a portable stand-in. A
-/// production build can swap this for a native Blake3 binding without
-/// changing any call sites.
+/// The current implementation uses SHA-256 from `swift-crypto` as a portable
+/// stand-in. CryptoSwift (added as a dependency for Scrypt key derivation)
+/// does not yet ship a Blake3 implementation; a dedicated Blake3 Swift package
+/// can be wired in here without changing any call sites.
 public struct Blake3Hasher: Sendable {
 
     // MARK: - Hash

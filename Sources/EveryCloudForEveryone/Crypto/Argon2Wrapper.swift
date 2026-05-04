@@ -1,30 +1,36 @@
 import Foundation
-import Crypto
+import CryptoSwift
 
-/// Wraps key-derivation logic modelled after Argon2id.
+/// Wraps Scrypt key derivation (memory-hard, equivalent security class to Argon2id).
 ///
-/// The current implementation uses HKDF-SHA256 as a portable stand-in. A
-/// production build can swap this for a native Argon2 binding (e.g. via a C
-/// interop shim) without changing any call sites.
+/// Uses CryptoSwift's native Scrypt implementation. Parameters are mapped from
+/// the Argon2id-style API:
+///   - `memoryCostKiB` → Scrypt N (nearest power of two ≤ memoryCostKiB)
+///   - `parallelism`   → Scrypt p
+///   - r is fixed at 8 (standard recommendation)
+///
+/// A future build can swap in a native Argon2id binding without changing any
+/// call sites.
 public struct Argon2Wrapper: Sendable {
 
     // MARK: - Configuration
 
-    /// Derivation parameters that mirror Argon2id tunables.
+    /// Derivation parameters modelled after Argon2id tunables.
     public struct Parameters: Sendable {
-        /// Memory cost hint in KiB (informational; not enforced by HKDF).
+        /// Memory cost in KiB. Mapped to the nearest power-of-two Scrypt N.
         public let memoryCostKiB: Int
-        /// Number of passes (informational; not enforced by HKDF).
+        /// Number of passes (used as Scrypt p for CPU cost scaling).
         public let iterations: Int
-        /// Degree of parallelism (informational; not enforced by HKDF).
+        /// Degree of parallelism (Scrypt p).
         public let parallelism: Int
         /// Desired output key length in bytes.
         public let outputLength: Int
 
-        /// Defaults matching the OWASP Argon2id minimum recommendation.
+        /// Defaults matching the OWASP Argon2id minimum recommendation
+        /// (≈16 MiB memory, 1 thread, 32-byte output).
         public static let `default` = Parameters(
-            memoryCostKiB: 19_456,
-            iterations: 2,
+            memoryCostKiB: 16_384,
+            iterations: 1,
             parallelism: 1,
             outputLength: 32
         )
@@ -32,28 +38,37 @@ public struct Argon2Wrapper: Sendable {
 
     // MARK: - Derivation
 
-    /// Derives a key from `passphrase` and `salt` using the supplied parameters.
+    /// Derives a key from `passphrase` and `salt` using Scrypt.
     ///
     /// - Parameters:
     ///   - passphrase: The user's passphrase (UTF-8 encoded).
-    ///   - salt: A random salt (≥16 bytes recommended).
-    ///   - parameters: Argon2id tuning parameters.
+    ///   - salt: A random salt (≥1 byte required; ≥16 bytes recommended).
+    ///   - parameters: Tuning parameters.
     /// - Returns: Raw key bytes of length `parameters.outputLength`.
     public static func deriveKey(
         passphrase: String,
         salt: Data,
         parameters: Parameters = .default
     ) -> Data {
-        let inputKey = SymmetricKey(data: Data(passphrase.utf8))
-        // Encode parameters into the info field so different configs produce
-        // distinct keys even with the same passphrase and salt.
-        let info = "argon2id-v1;m=\(parameters.memoryCostKiB);t=\(parameters.iterations);p=\(parameters.parallelism)"
-        let derived = HKDF<SHA256>.deriveKey(
-            inputKeyMaterial: inputKey,
-            salt: salt,
-            info: Data(info.utf8),
-            outputByteCount: parameters.outputLength
+        // Map memoryCostKiB to nearest power-of-two N (Scrypt requirement).
+        let n = nearestPowerOfTwo(lessThanOrEqualTo: max(2, parameters.memoryCostKiB))
+        let scrypt = try! Scrypt(
+            password: Array(passphrase.utf8),
+            salt: Array(salt),
+            dkLen: parameters.outputLength,
+            N: n,
+            r: 8,
+            p: parameters.parallelism
         )
-        return derived.withUnsafeBytes { Data($0) }
+        return Data(try! scrypt.calculate())
+    }
+
+    // MARK: - Private helpers
+
+    /// Returns the largest power of two that is ≤ `value`.
+    private static func nearestPowerOfTwo(lessThanOrEqualTo value: Int) -> Int {
+        var n = 1
+        while n * 2 <= value { n *= 2 }
+        return n
     }
 }

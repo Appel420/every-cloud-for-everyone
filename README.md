@@ -59,10 +59,10 @@ Sources/
       UniversalCloudSealer.swift   ← seals every CloudProvider in one call
       QResist.swift                ← uplink kill-switch on digest mismatch
       LockdownMode.swift           ← device-wide network lockdown
-      KeyManager.swift             ← HKDF key derivation + random salt generation
+      KeyManager.swift             ← Scrypt key derivation + random salt generation
     Crypto/
       Blake3Hasher.swift           ← SHA-256 hash with Blake3-compatible API
-      Argon2Wrapper.swift          ← HKDF key derivation with Argon2id parameters
+      Argon2Wrapper.swift          ← Scrypt (memory-hard) key derivation with Argon2id-style parameters
 Tests/
   EveryCloudForEveryoneTests/
     ContractEnforcerTests.swift    ← policy evaluation & AES-GCM round-trip
@@ -148,8 +148,8 @@ All 49 tests pass across seven test suites:
 
 | Component | Current implementation | Production target |
 |---|---|---|
-| Key derivation | HKDF-SHA256 (swift-crypto) | Argon2id via C interop |
-| Integrity hash | SHA-256 (Blake3-compatible API) | Blake3 via C interop |
+| Key derivation | Scrypt (CryptoSwift) – memory-hard KDF, same class as Argon2id | Argon2id via C interop |
+| Integrity hash | SHA-256 (swift-crypto, Blake3-compatible API) | Blake3 via dedicated Swift package |
 | Symmetric encryption | AES-256-GCM | AES-256-GCM (unchanged) |
 | Messaging layer | Conceptual (Signal Protocol design) | libsignal-client |
 

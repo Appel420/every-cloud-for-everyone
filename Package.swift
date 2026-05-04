@@ -13,13 +13,15 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.0.0")
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.0.0"),
+        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.8.3")
     ],
     targets: [
         .target(
             name: "EveryCloudForEveryone",
             dependencies: [
-                .product(name: "Crypto", package: "swift-crypto")
+                .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "CryptoSwift", package: "CryptoSwift")
             ],
             path: "Sources/EveryCloudForEveryone"
         ),

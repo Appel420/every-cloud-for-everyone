@@ -3,7 +3,8 @@ import Crypto
 
 /// Generates, stores, and retrieves on-device encryption keys.
 ///
-/// Keys are derived from a user passphrase using HKDF-SHA256.
+/// Keys are derived from a user passphrase using Scrypt (via ``Argon2Wrapper``),
+/// a memory-hard KDF in the same security class as Argon2id.
 /// The derived key never leaves the process boundary; only the salt is
 /// persisted alongside sealed data.
 public final class KeyManager: Sendable {
@@ -57,12 +58,17 @@ public final class KeyManager: Sendable {
     // MARK: - Private helpers
 
     private static func derive(passphrase: String, salt: Data) -> SymmetricKey {
-        let inputKey = SymmetricKey(data: Data(passphrase.utf8))
-        return HKDF<SHA256>.deriveKey(
-            inputKeyMaterial: inputKey,
-            salt: salt,
-            info: Data("every-cloud-for-everyone-v1".utf8),
-            outputByteCount: keyByteLength
+        let params = Argon2Wrapper.Parameters(
+            memoryCostKiB: 19_456,
+            iterations: 2,
+            parallelism: 1,
+            outputLength: keyByteLength
         )
+        let keyBytes = Argon2Wrapper.deriveKey(
+            passphrase: passphrase,
+            salt: salt,
+            parameters: params
+        )
+        return SymmetricKey(data: keyBytes)
     }
 }
