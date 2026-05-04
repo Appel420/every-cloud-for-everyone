@@ -10,7 +10,7 @@ A Swift package that applies client-side encryption on top of every major cloud 
 
 Every cloud account is *sealed* before any data leaves your device:
 
-1. A passphrase is used to derive a 256-bit key with HKDF-SHA256 (designed to be swapped for Argon2id in production).
+1. A passphrase is used to derive a 256-bit key with **Scrypt** (a memory-hard KDF in the same class as Argon2id, provided by CryptoSwift).
 2. The plaintext is encrypted with AES-GCM — the cloud provider only ever receives ciphertext.
 3. A SHA-256 integrity digest (Blake3-compatible interface) is computed and stored locally.
 4. QResist monitors uplinks; if a digest mismatch is detected the uplink is killed.
@@ -20,7 +20,7 @@ Every cloud account is *sealed* before any data leaves your device:
 User passphrase
       │
       ▼
-  HKDF-SHA256 ──► 256-bit key
+  Scrypt (memory-hard) ──► 256-bit key
       │
       ▼
   AES-GCM seal ──► ciphertext uploaded to cloud
