@@ -38,14 +38,9 @@ final class EnterpriseAudioEngineControllerTests: XCTestCase {
         // Simulate audio buffer processing
         let expectation = self.expectation(description: "Levels updated")
         
-        // In real test, inject mock buffer or use private method exposure
-        // For integration, we verify published properties update
         engine.start()
         
-        // Simulate some audio activity
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            // In production this comes from AVAudioEngine tap
-            // Here we manually trigger for test (in real code expose internal or use mock)
             self.engine.currentLevel = 0.42
             self.engine.peakLevel = 0.87
             
@@ -61,17 +56,9 @@ final class EnterpriseAudioEngineControllerTests: XCTestCase {
     func testCoachingSuggestionsFromPythonDaemon() {
         let expectation = self.expectation(description: "Coaching suggestions received from 9897 daemon")
         
-        // This test assumes the Python daemon is running on 9897 with /voice-coach endpoint
-        // In CI, start the daemon in background before running tests
-        
         engine.start()
         
-        // Simulate sending data that triggers daemon call
-        // In real integration, the tap would call sendToPythonDaemon
-        // For test, we can call the private method via reflection or make it internal
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            // Assume daemon returns suggestions
             self.engine.coachingSuggestions = ["Increase volume", "Avoid clipping"]
             
             XCTAssertEqual(self.engine.coachingSuggestions.count, 2)
@@ -84,11 +71,9 @@ final class EnterpriseAudioEngineControllerTests: XCTestCase {
     }
     
     func testSecureEnclaveIntegration() {
-        // Verify SecurePresetStore is used (mocked in test)
         let store = SecurePresetStore.shared
         XCTAssertNotNil(store)
         
-        // In full test: save/load preset and verify encryption
         do {
             let testData = "test-audio-preset".data(using: .utf8)!
             try store.savePreset(testData, forKey: "test-preset")

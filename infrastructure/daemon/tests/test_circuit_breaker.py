@@ -1,7 +1,8 @@
-'''
+
+"""
 tests/test_circuit_breaker.py
 Comprehensive pytest coverage for circuit_breaker.py (Ara-Hardened)
-'''
+"""
 
 import asyncio
 import pytest
