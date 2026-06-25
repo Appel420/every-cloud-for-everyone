@@ -39,7 +39,7 @@ User passphrase
 | Category | Providers |
 |---|---|
 | Consumer | iCloud · Google Drive · OneDrive · Dropbox · MEGA · pCloud · Sync.com |
-| Enterprise | AWS S3 · Azure Blob · Google Cloud Storage · Backblaze B2 · Wasabi |
+| Enterprise | AWS S3 · Azure Blob · Google Cloud Storage · Backblaze B2 · Wasabi · Cloudflare R2 · DigitalOcean Spaces |
 | Self-hosted / privacy-first | Nextcloud · Box · SpiderOak · Tresorit · Proton Drive · Filen |
 | Other infrastructure | Oracle Cloud · IBM Cloud · Alibaba Cloud · Tencent Cloud |
 
