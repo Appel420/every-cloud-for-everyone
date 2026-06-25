@@ -15,6 +15,8 @@ public enum CloudProvider: String, CaseIterable, Sendable {
     case googleCloudStorage = "Google Cloud Storage"
     case backblazeB2 = "Backblaze B2"
     case wasabi = "Wasabi"
+    case cloudflareR2 = "Cloudflare R2"
+    case digitalOceanSpaces = "DigitalOcean Spaces"
 
     // Self-hosted / privacy-first
     case nextcloud = "Nextcloud"
